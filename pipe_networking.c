@@ -10,7 +10,18 @@
   returns the file descriptor for the upstream pipe.
   =========================*/
 int server_setup() {
-  int from_client = 0;
+  if (mkfifo(WKP, 0666) == -1) {
+    printf("Error: %s\n", strerror(errno));
+    exit(EXIT_FAILURE);
+  }
+  printf("Named fifo created\n");
+  printf("Opened wkp\n");
+  int from_client = open(WKP, O_RDONLY);
+  printf("Connected\n");
+  if (unlink(WKP) == -1) {
+    printf("Error: %s\n", strerror(errno));
+    exit(EXIT_FAILURE);
+  }
   return from_client;
 }
 
