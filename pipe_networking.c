@@ -35,8 +35,12 @@ int server_setup() {
   returns the file descriptor for the upstream pipe (see server setup).
   =========================*/
 int server_handshake(int *to_client) {
-  int from_client = server_setup();
-  return from_client;
+    int from_client = server_setup();
+    //read SYN
+    int syn;
+    read(from_client, &syn, sizeof(int));
+    printf("Server reading SYN: %d\n", syn);
+    return from_client;
 }
 
 
@@ -50,17 +54,22 @@ int server_handshake(int *to_client) {
   returns the file descriptor for the downstream pipe.
   =========================*/
 int client_handshake(int *to_server) {
-    int *PP;
-    *PP = getpid();
+    int pid = getpid();
+    char *PP;
+    sprintf(PP, "%d", pid);
     if (mkfifo(PP, 0666) == -1) {
         printf("Error: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
-    printf("Client: created PP\n");
     *to_server = open(WKP, O_WRONLY);
-    write(*to_server, PP, sizeof(int));
-    printf("Client: sent PP to server\n");
-
+    if (*to_server == -1) {
+        printf("Error: %s\n", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+    write(*to_server, &pid, sizeof(int));
+    printf("Client: Opening PP\n");
+    int downstream = open(PP, O_RDONLY);
+    printf("Client: connected to PP\n");
     return 0;
 }
 
