@@ -62,6 +62,7 @@ int server_handshake(int *to_client) {
         printf("Error\n");
         exit(EXIT_FAILURE);
     }
+    printf("Server handshake successful\n");
     return from_client;
 }
 
@@ -77,7 +78,7 @@ int server_handshake(int *to_client) {
   =========================*/
 int client_handshake(int *to_server) {
     char PP[HANDSHAKE_BUFFER_SIZE];
-    sprintf("%d", getpid());
+    sprintf(PP, "%d", getpid());
     if (access(PP, F_OK) == 0) {
         if (unlink(PP) == -1) {
             printf("Error: %s\n", strerror(errno));
@@ -105,6 +106,7 @@ int client_handshake(int *to_server) {
     printf("Client removed PP\n");
     int ACK = SYN_ACK + 1;
     write(*to_server, &ACK, sizeof(int));
+    printf("Client handshake successful\n");
     return downstream;
 }
 
