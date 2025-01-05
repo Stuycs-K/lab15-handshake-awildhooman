@@ -17,10 +17,12 @@ static void sighandler(int signo) {
 
 int main() {
     signal(SIGINT, sighandler);
+    signal(SIGPIPE, sighandler);
     from_server = client_handshake( &to_server );
     int random;
-    while (1) {
-        read(from_server, &random, sizeof(int));
+    while (read(from_server, &random, sizeof(int))) {
         printf("Random number: %d\n", random);
     }
+    close(to_server);
+    close(from_server);
 }
