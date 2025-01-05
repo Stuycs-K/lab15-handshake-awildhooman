@@ -78,7 +78,6 @@ int server_handshake(int *to_client) {
   =========================*/
 int client_handshake(int *to_server) {
     *to_server = open(WKP, O_WRONLY);
-    printf("%d\n", *to_server);
     if (*to_server == -1) {
         printf("Error: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
