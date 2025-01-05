@@ -48,7 +48,20 @@ int server_setup() {
   =========================*/
 int server_handshake(int *to_client) {
     int from_client = server_setup();
+    char downstream[HANDSHAKE_BUFFER_SIZE];
+    read(from_client, &downstream, HANDSHAKE_BUFFER_SIZE);
 
+    *to_client = open(downstream, O_WRONLY);
+    srand(time(NULL));
+    int SYN_ACK = rand();
+    write(*to_client, &SYN_ACK, sizeof(int));
+
+    int ACK;
+    read(from_client, &ACK, sizeof(int));
+    if (ACK != SYN_ACK + 1) {
+        printf("Error\n");
+        exit(EXIT_FAILURE);
+    }
     return from_client;
 }
 
