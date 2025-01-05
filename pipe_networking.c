@@ -10,19 +10,31 @@
   returns the file descriptor for the upstream pipe.
   =========================*/
 int server_setup() {
-  if (mkfifo(WKP, 0666) == -1) {
-    printf("Error: %s\n", strerror(errno));
-    exit(EXIT_FAILURE);
-  }
-  printf("Named fifo created\n");
-  printf("Opened wkp\n");
-  int from_client = open(WKP, O_RDONLY);
-  printf("Connected\n");
-  if (unlink(WKP) == -1) {
-    printf("Error: %s\n", strerror(errno));
-    exit(EXIT_FAILURE);
-  }
-  return from_client;
+    if (access(WKP, F_OK) == 0) {
+        if (unlink(WKP) == -1) {
+            printf("Error: %s\n", strerror(errno));
+            exit(EXIT_FAILURE);
+        }
+        printf("Removed existing WKP\n");
+    }
+    if (mkfifo(WKP, 0666) == -1) {
+        printf("Error: %s\n", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+    printf("Created WKP\n");
+    printf("Server opening WKP\n");
+    int from_client = open(WKP, O_RDONLY);
+    if (from_client == -1) {
+        printf("Error: %s\n", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+    printf("Server connected to WKP\n");
+    if (unlink(WKP) == -1) {
+        printf("Error: %s\n", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+    printf("Server removed WKP\n");
+    return from_client;
 }
 
 /*=========================
@@ -36,10 +48,7 @@ int server_setup() {
   =========================*/
 int server_handshake(int *to_client) {
     int from_client = server_setup();
-    //read SYN
-    int syn;
-    read(from_client, &syn, sizeof(int));
-    printf("Server reading SYN: %d\n", syn);
+
     return from_client;
 }
 
@@ -54,23 +63,36 @@ int server_handshake(int *to_client) {
   returns the file descriptor for the downstream pipe.
   =========================*/
 int client_handshake(int *to_server) {
-    int pid = getpid();
-    char *PP;
-    sprintf(PP, "%d", pid);
+    char PP[HANDSHAKE_BUFFER_SIZE];
+    sprintf("%d", getpid());
+    if (access(PP, F_OK) == 0) {
+        if (unlink(PP) == -1) {
+            printf("Error: %s\n", strerror(errno));
+            exit(EXIT_FAILURE);
+        }
+        printf("Removed existing PP\n");
+    }
     if (mkfifo(PP, 0666) == -1) {
         printf("Error: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
+    printf("Client created PP\n");
     *to_server = open(WKP, O_WRONLY);
-    if (*to_server == -1) {
+    printf("Client connected to WKP\n");
+    write(*to_server, PP, HANDSHAKE_BUFFER_SIZE);
+    printf("Client send PP name to server\n");
+    int downstream = open(PP, O_RDONLY);
+    printf("Client connected to PP\n");
+    int SYN_ACK;
+    read(downstream, &SYN_ACK, sizeof(int));
+    if (unlink(PP) == -1) {
         printf("Error: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
-    write(*to_server, &pid, sizeof(int));
-    printf("Client: Opening PP\n");
-    int downstream = open(PP, O_RDONLY);
-    printf("Client: connected to PP\n");
-    return 0;
+    printf("Client removed PP\n");
+    int ACK = SYN_ACK + 1;
+    write(*to_server, &ACK, sizeof(int));
+    return downstream;
 }
 
 
