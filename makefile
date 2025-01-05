@@ -27,5 +27,4 @@ server_functions.o: server_functions.c server_functions.h
 	@gcc -c server_functions.c
 
 clean:
-	@rm *.o
-	@rm *~
+	@rm -f *.o server client

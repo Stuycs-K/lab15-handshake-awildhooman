@@ -48,6 +48,11 @@ int server_setup() {
   =========================*/
 int server_handshake(int *to_client) {
     int from_client = server_setup();
+    server_handshake_half(to_client, from_client);
+    return from_client;
+}
+
+int server_handshake_half(int *to_client, int from_client) {
     char downstream[HANDSHAKE_BUFFER_SIZE];
     read(from_client, &downstream, HANDSHAKE_BUFFER_SIZE);
 
@@ -63,9 +68,8 @@ int server_handshake(int *to_client) {
         exit(EXIT_FAILURE);
     }
 //    printf("Server handshake successful\n");
-    return from_client;
+    return *to_client;
 }
-
 
 /*=========================
   client_handshake
