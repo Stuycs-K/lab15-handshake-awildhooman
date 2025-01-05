@@ -77,6 +77,13 @@ int server_handshake(int *to_client) {
   returns the file descriptor for the downstream pipe.
   =========================*/
 int client_handshake(int *to_server) {
+    *to_server = open(WKP, O_WRONLY);
+    printf("%d\n", *to_server);
+    if (*to_server == -1) {
+        printf("Error: %s\n", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+    printf("Client connected to WKP\n");
     char PP[HANDSHAKE_BUFFER_SIZE];
     sprintf(PP, "%d", getpid());
     if (access(PP, F_OK) == 0) {
@@ -91,8 +98,6 @@ int client_handshake(int *to_server) {
         exit(EXIT_FAILURE);
     }
     printf("Client created PP\n");
-    *to_server = open(WKP, O_WRONLY);
-    printf("Client connected to WKP\n");
     write(*to_server, PP, HANDSHAKE_BUFFER_SIZE);
     printf("Client send PP name to server\n");
     int downstream = open(PP, O_RDONLY);
