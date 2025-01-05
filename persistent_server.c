@@ -1,5 +1,4 @@
 #include "pipe_networking.h"
-#include "server_functions.h"
 
 int to_client = -1;
 int from_client = -1;

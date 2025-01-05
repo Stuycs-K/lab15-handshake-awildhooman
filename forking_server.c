@@ -1,5 +1,4 @@
 #include "pipe_networking.h"
-#include "server_functions.h"
 
 int to_client = -1;
 int from_client = -1;
@@ -27,6 +26,7 @@ int main() {
     while (1) {
         printf("Looking for client...\n");
         from_client = server_setup();
+        printf("Connected to client!\n");
         connected = 1;
         if (fork() == 0) {
             to_client = server_handshake_half(&to_client, from_client);

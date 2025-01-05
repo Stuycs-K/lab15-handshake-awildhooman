@@ -117,19 +117,3 @@ int client_handshake(int *to_server) {
 //    printf("Client handshake successful\n");
     return downstream;
 }
-
-
-/*=========================
-  server_connect
-  args: int from_client
-
-  handles the subserver portion of the 3 way handshake
-
-  returns the file descriptor for the downstream pipe.
-  =========================*/
-int server_connect(int from_client) {
-  int to_client  = 0;
-  return to_client;
-}
-
-
