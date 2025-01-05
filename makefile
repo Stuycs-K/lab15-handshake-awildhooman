@@ -3,7 +3,7 @@ persistent: basic_client persistent_server
 forking: basic_client forking_server
 compile: forking
 
-basic_client Client: basic_client.o pipe_networking.o
+basic_client: basic_client.o pipe_networking.o
 	@gcc -o client_ basic_client.o pipe_networking.o
 
 basic_server: basic_server.o pipe_networking.o
