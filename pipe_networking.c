@@ -15,25 +15,25 @@ int server_setup() {
             printf("Error: %s\n", strerror(errno));
             exit(EXIT_FAILURE);
         }
-        printf("Removed existing WKP\n");
+//        printf("Removed existing WKP\n");
     }
     if (mkfifo(WKP, 0666) == -1) {
         printf("Error: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
-    printf("Created WKP\n");
-    printf("Server opening WKP\n");
+//    printf("Created WKP\n");
+//    printf("Server opening WKP\n");
     int from_client = open(WKP, O_RDONLY);
     if (from_client == -1) {
         printf("Error: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
-    printf("Server connected to WKP\n");
+//    printf("Server connected to WKP\n");
     if (unlink(WKP) == -1) {
         printf("Error: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
-    printf("Server removed WKP\n");
+//    printf("Server removed WKP\n");
     return from_client;
 }
 
@@ -62,7 +62,7 @@ int server_handshake(int *to_client) {
         printf("Error\n");
         exit(EXIT_FAILURE);
     }
-    printf("Server handshake successful\n");
+//    printf("Server handshake successful\n");
     return from_client;
 }
 
@@ -82,7 +82,7 @@ int client_handshake(int *to_server) {
         printf("Error: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
-    printf("Client connected to WKP\n");
+//    printf("Client connected to WKP\n");
     char PP[HANDSHAKE_BUFFER_SIZE];
     sprintf(PP, "%d", getpid());
     if (access(PP, F_OK) == 0) {
@@ -90,27 +90,27 @@ int client_handshake(int *to_server) {
             printf("Error: %s\n", strerror(errno));
             exit(EXIT_FAILURE);
         }
-        printf("Removed existing PP\n");
+//        printf("Removed existing PP\n");
     }
     if (mkfifo(PP, 0666) == -1) {
         printf("Error: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
-    printf("Client created PP\n");
+//    printf("Client created PP\n");
     write(*to_server, PP, HANDSHAKE_BUFFER_SIZE);
-    printf("Client send PP name to server\n");
+//    printf("Client send PP name to server\n");
     int downstream = open(PP, O_RDONLY);
-    printf("Client connected to PP\n");
+//    printf("Client connected to PP\n");
     int SYN_ACK;
     read(downstream, &SYN_ACK, sizeof(int));
     if (unlink(PP) == -1) {
         printf("Error: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
-    printf("Client removed PP\n");
+//    printf("Client removed PP\n");
     int ACK = SYN_ACK + 1;
     write(*to_server, &ACK, sizeof(int));
-    printf("Client handshake successful\n");
+//    printf("Client handshake successful\n");
     return downstream;
 }
 

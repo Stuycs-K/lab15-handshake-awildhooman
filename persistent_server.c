@@ -27,6 +27,7 @@ int main() {
     while (1) {
         printf("Looking for client...\n");
         from_client = server_handshake( &to_client );
+        printf("Client found!\n");
         connected = 1;
         while (connected) {
             int random = rand() % 101;
