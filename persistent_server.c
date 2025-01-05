@@ -13,7 +13,6 @@ static void sighandler(int signo) {
             close(from_client);
         }
         unlink(WKP);
-        exit(0);
     }
 }
 
@@ -21,12 +20,12 @@ int main() {
     srand(time(NULL));
     signal(SIGINT, sighandler);
     while (1) {
+        printf("Looking for client...\n");
         from_client = server_handshake( &to_client );
-        char lineBuffer[100];
-        read(from_client, lineBuffer, sizeof(lineBuffer));
-        modify(lineBuffer, rand());
-        write(to_client, lineBuffer, sizeof(lineBuffer));
-        close(to_client);
-        close(from_client);
+        while (1) {
+            int random = rand() % 101;
+            write(to_client, &random, sizeof(int));
+            sleep(1);
+        }
     }
 }
