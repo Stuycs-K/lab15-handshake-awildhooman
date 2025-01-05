@@ -1,8 +1,22 @@
 #include "pipe_networking.h"
 
+int to_server = -1;
+int from_server = -1;
+
+static void sighandler(int signo) {
+    if (signo == SIGINT) {
+        if (to_server != -1) {
+            close(to_server);
+        }
+        if (from_server != -1) {
+            close(from_server);
+        }
+        exit(0);
+    }
+}
+
 int main() {
-    int to_server;
-    int from_server;
+    signal(SIGINT, sighandler);
 
     from_server = client_handshake( &to_server );
     char lineBuffer[100];
